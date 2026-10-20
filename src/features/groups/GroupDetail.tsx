@@ -35,7 +35,7 @@ export function GroupDetail({ group, onBack }: { group: Group; onBack: () => voi
       </Button>
       <PageHeader
         title={group.name}
-        subtitle={[group.subject, group.deadline && `Hạn nộp ${formatDate(group.deadline)} (${relativeLabel(group.deadline, today).toLowerCase()})`]
+        subtitle={[group.subject, group.deadline && `Hạn nộp ${formatDate(group.deadline)} (${overall.total > 0 && overall.done === overall.total ? 'đã hoàn thành' : relativeLabel(group.deadline, today).toLowerCase()})`]
           .filter(Boolean)
           .join(' · ')}
         actions={
@@ -51,15 +51,15 @@ export function GroupDetail({ group, onBack }: { group: Group; onBack: () => voi
       />
 
       <div className="mb-6 grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-1">
+        <Card className="self-start lg:col-span-1">
           <h2 className="mb-1 font-semibold">Tiến độ chung</h2>
-          <p className="mb-3 text-sm text-slate-500">
+          <p className="mb-3 text-sm text-muted">
             {overall.done}/{overall.total} việc xong · còn ~{formatHours(remaining)}
           </p>
           <ProgressBar value={overall.ratio} label="Tiến độ chung của nhóm" />
           {overall.total > 0 && overall.done === overall.total && (
             <div className="mt-3">
-              <Badge tone="emerald">Đã hoàn thành tất cả việc</Badge>
+              <Badge tone="moss">Đã hoàn thành tất cả việc</Badge>
             </div>
           )}
         </Card>

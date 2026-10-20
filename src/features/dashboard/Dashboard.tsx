@@ -1,10 +1,21 @@
+import type { CSSProperties } from 'react'
 import { Button, Card, PageHeader, ProgressBar } from '../../components/ui'
-import { addDays, deadlineBucket, formatDate, formatHours, todayISO } from '../../lib/date'
+import { addDays, deadlineBucket, formatHours, todayISO } from '../../lib/date'
 import type { Tab } from '../../lib/labels'
 import { byDeadline, stepProgress, sumMinutes, taskProgress } from '../../lib/progress'
 import { behindSteps } from '../../lib/roadmapGenerator'
 import { useAppStore } from '../../store/context'
 import { TaskItem } from '../tasks/TaskItem'
+
+function greeting(): string {
+  const h = new Date().getHours()
+  if (h < 11) return 'Chào buổi sáng!'
+  if (h < 14) return 'Chào buổi trưa!'
+  if (h < 18) return 'Chào buổi chiều!'
+  return 'Chào buổi tối!'
+}
+
+const parseISO = (iso: string) => new Date(`${iso}T00:00:00`)
 
 export function Dashboard({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
   const { data } = useAppStore()
@@ -14,6 +25,7 @@ export function Dashboard({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
   const dueToday = open.filter((t) => deadlineBucket(t, today) === 'today')
   const dueWeek = open.filter((t) => deadlineBucket(t, today) === 'week')
   const upcoming = [...overdue, ...dueToday, ...dueWeek]
+  const weekHours = sumMinutes(upcoming) / 60
   const groupName = new Map(data.groups.map((g) => [g.id, g.name]))
   const memberName = new Map(data.members.map((m) => [m.id, m.name]))
 
@@ -24,92 +36,111 @@ export function Dashboard({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
   })
   const maxMinutes = Math.max(60, ...days.map((d) => d.minutes))
 
-  const stats = [
-    { label: 'Quá hạn', value: overdue.length, sub: formatHours(sumMinutes(overdue)), accent: overdue.length ? 'text-red-600' : '' },
-    { label: 'Hôm nay', value: dueToday.length, sub: formatHours(sumMinutes(dueToday)), accent: dueToday.length ? 'text-amber-700' : '' },
-    { label: '7 ngày tới', value: dueWeek.length, sub: formatHours(sumMinutes(dueWeek)), accent: '' },
-    { label: 'Cần học tuần này', value: formatHours(sumMinutes(upcoming)), sub: 'gồm cả việc quá hạn', accent: 'text-indigo-700' },
+  const notes = [
+    { label: 'quá hạn', count: overdue.length, minutes: sumMinutes(overdue), color: overdue.length ? 'text-danger' : 'text-faint' },
+    { label: 'hôm nay', count: dueToday.length, minutes: sumMinutes(dueToday), color: dueToday.length ? 'text-ochre' : 'text-faint' },
+    { label: 'sắp tới', count: dueWeek.length, minutes: sumMinutes(dueWeek), color: 'text-ink' },
   ]
 
   return (
     <>
-      <PageHeader title="Tổng quan" subtitle={`Hôm nay, ${formatDate(today)}`} />
+      <PageHeader
+        eyebrow={greeting()}
+        title={parseISO(today).toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long' })}
+      />
 
-      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {stats.map((s) => (
-          <Card key={s.label}>
-            <p className="text-xs font-medium text-slate-500">{s.label}</p>
-            <p className={`mt-1 text-2xl font-bold tabular-nums ${s.accent}`}>{s.value}</p>
-            <p className="text-xs text-slate-500">{s.sub}</p>
-          </Card>
-        ))}
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-5">
-        <div className="space-y-6 lg:col-span-3">
-          <Card>
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-semibold">Cần làm sớm</h2>
-              <Button variant="ghost" size="sm" onClick={() => onNavigate('tasks')}>
-                Xem tất cả →
-              </Button>
-            </div>
-            {upcoming.length === 0 ? (
-              <p className="text-sm text-slate-500">Không có việc nào đến hạn trong 7 ngày tới.</p>
-            ) : (
-              <ul className="space-y-2">
-                {upcoming.slice(0, 6).map((t) => (
-                  <TaskItem
-                    key={t.id}
-                    task={t}
-                    today={today}
-                    compact
-                    groupName={t.groupId ? groupName.get(t.groupId) : undefined}
-                    assigneeName={t.assigneeId ? memberName.get(t.assigneeId) : undefined}
-                  />
-                ))}
-              </ul>
-            )}
-          </Card>
-
-          <Card>
-            <h2 className="mb-3 font-semibold">Khối lượng 7 ngày tới</h2>
-            <ul className="space-y-2">
-              {days.map((d) => (
-                <li key={d.date} className="flex items-center gap-3 text-sm">
-                  <span className="w-24 shrink-0 whitespace-nowrap text-slate-500">{d.date === today ? 'Hôm nay' : formatDate(d.date)}</span>
-                  <div className="h-3 flex-1 overflow-hidden rounded bg-slate-100">
-                    <div className="h-full rounded bg-indigo-400" style={{ width: `${(d.minutes / maxMinutes) * 100}%` }} />
-                  </div>
-                  <span className="w-14 shrink-0 text-right text-xs text-slate-600 tabular-nums">
-                    {d.minutes ? formatHours(d.minutes) : '–'}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </Card>
+      {/* Khối chính: số giờ cần học tuần này + biểu đồ 7 ngày */}
+      <Card tape index={1} className="mb-10 grid gap-8 p-6 sm:p-8 md:grid-cols-[1fr_auto]">
+        <div>
+          <p className="text-sm text-muted">Tuần này bạn cần khoảng</p>
+          <p className="mt-2 font-display text-6xl leading-none font-semibold tracking-tight sm:text-7xl">
+            <span className="highlight tabular-nums">{Number.isInteger(weekHours) ? weekHours : weekHours.toFixed(1)}</span>
+            <span className="ml-2 text-3xl font-normal text-muted italic sm:text-4xl">giờ</span>
+          </p>
+          <ul className="mt-7 flex flex-wrap gap-x-8 gap-y-3">
+            {notes.map((n) => (
+              <li key={n.label}>
+                <span className={`font-display text-3xl font-semibold tabular-nums ${n.color}`}>{n.count}</span>
+                <span className="ml-1.5 font-hand text-lg text-ink-soft">{n.label}</span>
+                <p className="text-xs text-muted">{n.minutes ? `~${formatHours(n.minutes)}` : '—'}</p>
+              </li>
+            ))}
+          </ul>
         </div>
 
+        <figure className="md:w-72">
+          <figcaption className="mb-3 font-hand text-lg text-muted">Khối lượng bảy ngày tới</figcaption>
+          <ol className="flex h-36 items-end gap-2" aria-label="Số giờ cần học mỗi ngày trong 7 ngày tới">
+            {days.map((d, i) => {
+              const isToday = i === 0
+              const label = parseISO(d.date).toLocaleDateString('vi-VN', { weekday: 'short' })
+              return (
+                <li
+                  key={d.date}
+                  className="flex h-full flex-1 flex-col items-center justify-end gap-1"
+                  aria-label={`${isToday ? 'Hôm nay' : label}: ${d.minutes ? formatHours(d.minutes) : 'không có việc'}`}
+                >
+                  <span className="text-[11px] font-semibold leading-none text-ink-soft tabular-nums">{d.minutes ? d.minutes / 60 : ''}</span>
+                  <div
+                    className={`w-full rounded-t-sm transition-[height] duration-700 ${isToday ? 'bg-accent' : 'bg-accent/35'}`}
+                    style={{ height: `${Math.max(d.minutes ? 8 : 2, (d.minutes / maxMinutes) * 100)}%` }}
+                  />
+                  <span className={`text-[11px] whitespace-nowrap ${isToday ? 'font-bold text-accent' : 'text-muted'}`}>
+                    {isToday ? 'Nay' : label}
+                  </span>
+                </li>
+              )
+            })}
+          </ol>
+        </figure>
+      </Card>
+
+      <div className="grid gap-8 lg:grid-cols-5">
+        <section className="rise lg:col-span-3" style={{ '--i': 2 } as CSSProperties}>
+          <div className="mb-3 flex items-baseline justify-between">
+            <h2 className="text-2xl font-semibold">Cần làm sớm</h2>
+            <Button variant="ghost" size="sm" onClick={() => onNavigate('tasks')}>
+              Xem tất cả →
+            </Button>
+          </div>
+          {upcoming.length === 0 ? (
+            <p className="font-hand text-lg text-muted">Tuần này rảnh rang, không có deadline nào.</p>
+          ) : (
+            <ul className="space-y-2">
+              {upcoming.slice(0, 6).map((t) => (
+                <TaskItem
+                  key={t.id}
+                  task={t}
+                  today={today}
+                  compact
+                  groupName={t.groupId ? groupName.get(t.groupId) : undefined}
+                  assigneeName={t.assigneeId ? memberName.get(t.assigneeId) : undefined}
+                />
+              ))}
+            </ul>
+          )}
+        </section>
+
         <div className="space-y-6 lg:col-span-2">
-          <Card>
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-semibold">Bài tập nhóm</h2>
+          <Card index={3}>
+            <div className="mb-4 flex items-baseline justify-between">
+              <h2 className="text-lg font-semibold">Bài tập nhóm</h2>
               <Button variant="ghost" size="sm" onClick={() => onNavigate('groups')}>
                 Mở →
               </Button>
             </div>
             {data.groups.length === 0 ? (
-              <p className="text-sm text-slate-500">Chưa có nhóm nào.</p>
+              <p className="font-hand text-lg text-muted">Chưa có nhóm nào.</p>
             ) : (
-              <ul className="space-y-3">
+              <ul className="space-y-4">
                 {data.groups.map((g) => {
                   const p = taskProgress(data.tasks.filter((t) => t.groupId === g.id))
                   return (
                     <li key={g.id}>
-                      <div className="mb-1 flex justify-between gap-2 text-sm">
+                      <div className="mb-1.5 flex justify-between gap-2 text-sm">
                         <span className="truncate font-medium">{g.name}</span>
-                        <span className="shrink-0 text-xs text-slate-500">
-                          {p.done}/{p.total}
+                        <span className="shrink-0 text-xs text-muted">
+                          {p.done}/{p.total} việc
                         </span>
                       </div>
                       <ProgressBar value={p.ratio} label={`Tiến độ nhóm ${g.name}`} />
@@ -120,24 +151,24 @@ export function Dashboard({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
             )}
           </Card>
 
-          <Card>
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-semibold">Lộ trình tự học</h2>
+          <Card index={4}>
+            <div className="mb-4 flex items-baseline justify-between">
+              <h2 className="text-lg font-semibold">Lộ trình tự học</h2>
               <Button variant="ghost" size="sm" onClick={() => onNavigate('roadmap')}>
                 Mở →
               </Button>
             </div>
             {data.roadmaps.length === 0 ? (
-              <p className="text-sm text-slate-500">Chưa có lộ trình nào.</p>
+              <p className="font-hand text-lg text-muted">Chưa có lộ trình nào.</p>
             ) : (
-              <ul className="space-y-3">
+              <ul className="space-y-4">
                 {data.roadmaps.map((plan) => {
                   const behind = behindSteps(plan, today).length
                   return (
                     <li key={plan.id}>
-                      <div className="mb-1 flex justify-between gap-2 text-sm">
+                      <div className="mb-1.5 flex justify-between gap-2 text-sm">
                         <span className="truncate font-medium">{plan.topic}</span>
-                        {behind > 0 && <span className="shrink-0 text-xs text-amber-700">chậm {behind} bước</span>}
+                        {behind > 0 && <span className="shrink-0 text-xs font-semibold text-ochre">chậm {behind} bước</span>}
                       </div>
                       <ProgressBar value={stepProgress(plan.steps).ratio} label={`Tiến độ ${plan.topic}`} />
                     </li>

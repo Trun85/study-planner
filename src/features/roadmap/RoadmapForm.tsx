@@ -43,7 +43,7 @@ export function RoadmapForm({ onCancel, onCreated }: Props) {
       <Button variant="ghost" size="sm" onClick={onCancel} className="mb-3 -ml-2">
         ← Quay lại
       </Button>
-      <PageHeader title="Tạo lộ trình học" subtitle="Chọn chủ đề và cho biết bạn có bao nhiêu thời gian, app sẽ chia thành kế hoạch theo tuần." />
+      <PageHeader eyebrow="Lên kế hoạch" title="Tạo lộ trình học" subtitle="Chọn chủ đề và cho biết bạn có bao nhiêu thời gian, app sẽ chia thành kế hoạch theo tuần." />
 
       <fieldset className="mb-6">
         <legend className="mb-2 text-sm font-semibold">1. Chủ đề</legend>
@@ -51,7 +51,7 @@ export function RoadmapForm({ onCancel, onCreated }: Props) {
           {ROADMAP_TEMPLATES.map((t) => (
             <label
               key={t.id}
-              className={`cursor-pointer rounded-xl bg-white p-4 ring-1 transition has-focus-visible:outline-2 has-focus-visible:outline-indigo-500 ${templateId === t.id ? 'ring-2 ring-indigo-500' : 'ring-slate-200 hover:ring-slate-300'}`}
+              className={`cursor-pointer rounded-xl bg-card p-4 ring-1 transition has-focus-visible:outline-2 has-focus-visible:outline-accent ${templateId === t.id ? 'ring-2 ring-accent' : 'ring-line hover:ring-line'}`}
             >
               <input
                 type="radio"
@@ -61,9 +61,9 @@ export function RoadmapForm({ onCancel, onCreated }: Props) {
                 onChange={() => setTemplateId(t.id)}
                 className="sr-only"
               />
-              <p className="font-semibold">{t.topic}</p>
-              <p className="mt-1 text-sm text-slate-500">{t.summary}</p>
-              <p className="mt-2 text-xs text-slate-400">{t.steps.length} bước</p>
+              <p className="font-display text-lg font-semibold">{t.topic}</p>
+              <p className="mt-1 text-sm text-muted">{t.summary}</p>
+              <p className="mt-2 text-xs text-faint">{t.steps.length} bước</p>
             </label>
           ))}
         </div>
@@ -71,11 +71,11 @@ export function RoadmapForm({ onCancel, onCreated }: Props) {
 
       <fieldset className="mb-6">
         <legend className="mb-2 text-sm font-semibold">2. Trình độ hiện tại</legend>
-        <div className="inline-flex flex-wrap rounded-lg bg-slate-200/70 p-1">
+        <div className="inline-flex flex-wrap rounded-lg bg-sunken p-1">
           {(Object.keys(LEVEL_LABEL) as Level[]).map((l) => (
             <label
               key={l}
-              className={`cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-focus-visible:outline-2 has-focus-visible:outline-indigo-500 ${level === l ? 'bg-white shadow-sm' : 'text-slate-600'}`}
+              className={`cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-focus-visible:outline-2 has-focus-visible:outline-accent ${level === l ? 'bg-card shadow-sm' : 'text-ink-soft'}`}
             >
               <input type="radio" name="level" value={l} checked={level === l} onChange={() => setLevel(l)} className="sr-only" />
               {LEVEL_LABEL[l]}
@@ -83,7 +83,7 @@ export function RoadmapForm({ onCancel, onCreated }: Props) {
           ))}
         </div>
         {level === 'intermediate' && skipped > 0 && (
-          <p className="mt-2 text-xs text-slate-500">Bỏ qua {skipped} bước nền tảng của chủ đề này.</p>
+          <p className="mt-2 text-xs text-muted">Bỏ qua {skipped} bước nền tảng của chủ đề này.</p>
         )}
       </fieldset>
 
@@ -107,19 +107,19 @@ export function RoadmapForm({ onCancel, onCreated }: Props) {
         </div>
       </fieldset>
 
-      <Card className="mb-6 bg-indigo-50/50">
+      <Card className="mb-6 bg-accent-soft">
         {preview ? (
           <>
             <p className="font-semibold">
               {preview.steps.length} bước · {totalHours} giờ · khoảng {preview.totalWeeks} tuần
             </p>
-            <p className="mt-1 text-sm text-slate-600">
+            <p className="mt-1 text-sm text-ink-soft">
               Dự kiến hoàn thành: {formatDate(addDays(startDate, preview.totalWeeks * 7 - 1))}
             </p>
             <ol className="mt-3 space-y-1 text-sm">
               {preview.steps.map((s) => (
                 <li key={s.id} className="flex gap-2">
-                  <span className="w-20 shrink-0 text-slate-500 tabular-nums">
+                  <span className="w-20 shrink-0 text-muted tabular-nums">
                     Tuần {s.week}
                     {s.endWeek > s.week ? `–${s.endWeek}` : ''}
                   </span>
@@ -129,7 +129,7 @@ export function RoadmapForm({ onCancel, onCreated }: Props) {
             </ol>
           </>
         ) : (
-          <p className="text-sm text-slate-500">Nhập số giờ mỗi tuần từ 1 đến 60 để xem trước lộ trình.</p>
+          <p className="text-sm text-muted">Nhập số giờ mỗi tuần từ 1 đến 60 để xem trước lộ trình.</p>
         )}
       </Card>
 

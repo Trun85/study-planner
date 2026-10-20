@@ -4,7 +4,7 @@ import { todayISO } from '../lib/date'
 import { DATA_VERSION, isAppData } from '../lib/storage'
 import { useAppStore } from '../store/context'
 
-const itemClass = 'block w-full rounded-md px-3 py-2 text-left text-sm hover:bg-slate-100'
+const itemClass = 'block w-full rounded-md px-3 py-2 text-left text-sm hover:bg-sunken'
 
 /** Sao lưu / khôi phục dữ liệu, vì localStorage chỉ nằm trong trình duyệt này. */
 export function DataMenu() {
@@ -52,10 +52,10 @@ export function DataMenu() {
 
   return (
     <details ref={menuRef} className="relative">
-      <summary className="cursor-pointer list-none rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 [&::-webkit-details-marker]:hidden">
+      <summary className="cursor-pointer list-none rounded-lg px-3 py-1.5 text-sm font-medium text-ink-soft hover:bg-sunken [&::-webkit-details-marker]:hidden">
         Dữ liệu ▾
       </summary>
-      <div className="absolute right-0 z-40 mt-1 w-56 rounded-lg bg-white p-1 shadow-lg ring-1 ring-slate-200">
+      <div className="absolute right-0 z-40 mt-1 w-56 rounded-lg bg-card p-1 shadow-lg ring-1 ring-line">
         <button type="button" className={itemClass} onClick={handleExport}>
           Xuất file JSON (sao lưu)
         </button>
@@ -65,7 +65,7 @@ export function DataMenu() {
         <button type="button" className={itemClass} onClick={handleSeed}>
           Nạp lại dữ liệu mẫu
         </button>
-        <button type="button" className={`${itemClass} text-red-600`} onClick={handleClear}>
+        <button type="button" className={`${itemClass} text-danger`} onClick={handleClear}>
           Xoá toàn bộ dữ liệu
         </button>
         <input ref={fileRef} type="file" accept="application/json,.json" className="hidden" onChange={handleImport} />

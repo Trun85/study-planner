@@ -73,7 +73,7 @@ function TaskForm({ task, groupId, defaultStatus, onClose }: Omit<Props, 'open'>
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {group && <p className="text-sm text-slate-500">Nhóm: {group.name}</p>}
+      {group && <p className="text-sm text-muted">Nhóm: {group.name}</p>}
       <Field label="Tên việc *">
         <input className={inputClass} value={title} onChange={(e) => setTitle(e.target.value)} required autoFocus />
       </Field>

@@ -33,6 +33,7 @@ export function RoadmapPage() {
   return (
     <>
       <PageHeader
+        eyebrow="Tự học công nghệ"
         title="Lộ trình tự học"
         subtitle="Kế hoạch theo tuần, tính theo trình độ và quỹ thời gian của bạn."
         actions={<Button onClick={() => setCreating(true)}>+ Tạo lộ trình</Button>}
@@ -54,17 +55,17 @@ export function RoadmapPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedId(plan.id)}
-                  className="w-full rounded-xl bg-white p-4 text-left shadow-sm ring-1 ring-slate-200 transition hover:ring-indigo-300 focus-visible:outline-2 focus-visible:outline-indigo-500"
+                  className="w-full rounded-lg bg-card p-5 text-left shadow-paper ring-1 ring-line transition hover:-translate-y-0.5 hover:ring-accent focus-visible:outline-2 focus-visible:outline-accent"
                 >
-                  <p className="font-semibold">{plan.topic}</p>
-                  <p className="mt-0.5 text-sm text-slate-500">
+                  <p className="font-display text-lg font-semibold">{plan.topic}</p>
+                  <p className="mt-0.5 text-sm text-muted">
                     {LEVEL_LABEL[plan.level]} · {plan.hoursPerWeek} giờ/tuần ·{' '}
                     {week >= 1 ? `tuần ${Math.min(week, plan.totalWeeks)}/${plan.totalWeeks}` : 'chưa bắt đầu'}
                   </p>
                   <div className="mt-3">
                     <ProgressBar value={p.ratio} label={`Tiến độ ${plan.topic}`} />
                   </div>
-                  {behind > 0 && <p className="mt-2 text-xs text-amber-700">Chậm {behind} bước so với kế hoạch</p>}
+                  {behind > 0 && <p className="mt-2 text-xs text-ochre">Chậm {behind} bước so với kế hoạch</p>}
                 </button>
               </li>
             )

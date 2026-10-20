@@ -46,12 +46,12 @@ export function RoadmapView({ plan, onBack }: { plan: RoadmapPlan; onBack: () =>
 
   const status =
     week < 1
-      ? { tone: 'slate' as const, text: `Bắt đầu sau ${daysBetween(today, plan.startDate)} ngày` }
+      ? { tone: 'neutral' as const, text: `Bắt đầu sau ${daysBetween(today, plan.startDate)} ngày` }
       : progress.done === progress.total
-        ? { tone: 'emerald' as const, text: 'Đã hoàn thành lộ trình' }
+        ? { tone: 'moss' as const, text: 'Đã hoàn thành lộ trình' }
         : behind.size > 0
-          ? { tone: 'amber' as const, text: `Chậm ${behind.size} bước so với kế hoạch` }
-          : { tone: 'emerald' as const, text: 'Đúng tiến độ' }
+          ? { tone: 'ochre' as const, text: `Chậm ${behind.size} bước so với kế hoạch` }
+          : { tone: 'moss' as const, text: 'Đúng tiến độ' }
 
   return (
     <>
@@ -74,7 +74,7 @@ export function RoadmapView({ plan, onBack }: { plan: RoadmapPlan; onBack: () =>
             <span className="font-semibold">
               {progress.done}/{progress.total} bước
             </span>
-            <span className="text-slate-500">
+            <span className="text-muted">
               {' '}
               · {week >= 1 ? `tuần ${Math.min(week, plan.totalWeeks)}/${plan.totalWeeks}` : `${plan.totalWeeks} tuần`}
             </span>
@@ -89,37 +89,37 @@ export function RoadmapView({ plan, onBack }: { plan: RoadmapPlan; onBack: () =>
           <li key={w}>
             <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold">
               Tuần {w}
-              {w === week && <Badge tone="indigo">Tuần này</Badge>}
+              {w === week && <Badge tone="accent">Tuần này</Badge>}
             </h2>
             <ul className="space-y-2">
               {steps.map((s) => (
                 <li
                   key={s.id}
-                  className={`flex items-start gap-3 rounded-lg bg-white p-3 ring-1 ${behind.has(s.id) ? 'ring-amber-300' : 'ring-slate-200'}`}
+                  className={`flex items-start gap-3 rounded-lg bg-card p-3 ring-1 ${behind.has(s.id) ? 'ring-ochre' : 'ring-line'}`}
                 >
                   <input
                     type="checkbox"
                     checked={s.done}
                     onChange={() => dispatch({ type: 'roadmap/toggleStep', planId: plan.id, stepId: s.id })}
                     aria-label={`Đánh dấu "${s.title}" là ${s.done ? 'chưa xong' : 'đã xong'}`}
-                    className="mt-1 size-4 shrink-0 accent-indigo-600"
+                    className="check"
                   />
                   <div className="min-w-0 flex-1">
-                    <p className={`font-medium ${s.done ? 'text-slate-400 line-through' : ''}`}>{s.title}</p>
-                    <p className="mt-0.5 text-sm text-slate-600">{s.description}</p>
-                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                    <p className={`font-medium ${s.done ? 'struck' : ''}`}>{s.title}</p>
+                    <p className="mt-0.5 text-sm text-ink-soft">{s.description}</p>
+                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
                       <span>
                         {s.endWeek > s.week ? `Tuần ${s.week}–${s.endWeek} · ` : ''}~{s.estimatedHours} giờ · hạn{' '}
                         {formatDate(stepDueDate(plan, s))}
                       </span>
-                      {behind.has(s.id) && <Badge tone="amber">Chậm tiến độ</Badge>}
+                      {behind.has(s.id) && <Badge tone="ochre">Chậm tiến độ</Badge>}
                       {s.resources.map((r) => (
                         <a
                           key={r.url}
                           href={r.url}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-indigo-600 underline-offset-2 hover:underline"
+                          className="text-accent underline-offset-2 hover:underline"
                         >
                           {r.title} ↗
                         </a>
@@ -127,7 +127,7 @@ export function RoadmapView({ plan, onBack }: { plan: RoadmapPlan; onBack: () =>
                     </div>
                   </div>
                   {linkedStepIds.has(s.id) ? (
-                    <Badge tone="emerald">Đã có trong Việc học</Badge>
+                    <Badge tone="moss">Đã có trong Việc học</Badge>
                   ) : (
                     <Button variant="secondary" size="sm" onClick={() => addToTasks(s)}>
                       + Việc học

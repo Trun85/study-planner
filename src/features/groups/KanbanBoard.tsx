@@ -6,9 +6,9 @@ import type { ID, Member, Task, TaskStatus } from '../../types'
 import { Avatar } from './Avatar'
 
 const COLUMNS: { status: TaskStatus; dot: string }[] = [
-  { status: 'todo', dot: 'bg-slate-400' },
-  { status: 'in_progress', dot: 'bg-sky-500' },
-  { status: 'done', dot: 'bg-emerald-500' },
+  { status: 'todo', dot: 'bg-faint' },
+  { status: 'in_progress', dot: 'bg-blue' },
+  { status: 'done', dot: 'bg-moss' },
 ]
 
 interface Props {
@@ -60,16 +60,16 @@ export function KanbanBoard({ tasks, members, today, onEdit, onAdd }: Props) {
               if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDragOver(null)
             }}
             onDrop={(e) => handleDrop(e, col.status)}
-            className={`flex min-h-48 flex-col rounded-xl p-3 transition ${active ? 'bg-indigo-50 ring-2 ring-indigo-400' : 'bg-slate-100'}`}
+            className={`flex min-h-56 flex-col rounded-lg border-2 border-dashed p-3 transition ${active ? 'border-accent bg-accent-soft' : 'border-transparent bg-sunken'}`}
           >
-            <header className="mb-3 flex items-center gap-2">
-              <span className={`size-2 rounded-full ${col.dot}`} />
-              <h3 className="text-sm font-semibold">{STATUS_LABEL[col.status]}</h3>
-              <span className="text-xs text-slate-500">{items.length}</span>
+            <header className="mb-3 flex items-center gap-2 px-1">
+              <span className={`size-2.5 rounded-full ${col.dot}`} />
+              <h3 className="text-base font-semibold">{STATUS_LABEL[col.status]}</h3>
+              <span className="text-xs font-semibold text-muted tabular-nums">{items.length}</span>
               <button
                 type="button"
                 onClick={() => onAdd(col.status)}
-                className="ml-auto rounded px-1.5 text-lg leading-none text-slate-500 hover:bg-white hover:text-slate-800"
+                className="ml-auto rounded px-1.5 text-lg leading-none text-muted hover:bg-card hover:text-ink"
                 aria-label={`Thêm việc vào cột ${STATUS_LABEL[col.status]}`}
               >
                 +
@@ -93,21 +93,21 @@ export function KanbanBoard({ tasks, members, today, onEdit, onAdd }: Props) {
                       setDraggingId(null)
                       setDragOver(null)
                     }}
-                    className={`cursor-grab rounded-lg bg-white p-3 shadow-sm ring-1 ring-slate-200 active:cursor-grabbing ${draggingId === t.id ? 'opacity-40' : ''}`}
+                    className={`cursor-grab rounded-md bg-card p-3 shadow-paper ring-1 ring-line transition hover:-rotate-[0.6deg] hover:shadow-lg active:cursor-grabbing ${draggingId === t.id ? 'rotate-2 opacity-40' : ''}`}
                   >
                     <button
                       type="button"
                       onClick={() => onEdit(t)}
-                      className={`text-left text-sm font-medium break-words hover:text-indigo-700 ${t.status === 'done' ? 'text-slate-400 line-through' : ''}`}
+                      className={`text-left text-sm font-medium break-words hover:text-accent-strong ${t.status === 'done' ? 'struck' : ''}`}
                     >
                       {t.title}
                     </button>
-                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
                       <span className="inline-flex items-center gap-1.5">
                         {assignee ? <Avatar name={assignee.name} /> : null}
                         {assignee?.name ?? 'Chưa giao'}
                       </span>
-                      <span className={overdue ? 'font-medium text-red-600' : ''}>
+                      <span className={overdue ? 'font-semibold text-danger' : ''}>
                         {t.status === 'done' ? 'Đã xong' : relativeLabel(t.dueDate, today)}
                       </span>
                       {t.estimatedMinutes ? <span>~{formatHours(t.estimatedMinutes)}</span> : null}
@@ -116,7 +116,7 @@ export function KanbanBoard({ tasks, members, today, onEdit, onAdd }: Props) {
                       value={t.status}
                       onChange={(e) => move(t.id, e.target.value as TaskStatus)}
                       aria-label={`Chuyển trạng thái "${t.title}"`}
-                      className="mt-2 w-full rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs text-slate-600"
+                      className="mt-2.5 w-full cursor-pointer rounded border border-line bg-paper px-2 py-1 text-xs text-ink-soft"
                     >
                       {COLUMNS.map((c) => (
                         <option key={c.status} value={c.status}>
@@ -128,7 +128,7 @@ export function KanbanBoard({ tasks, members, today, onEdit, onAdd }: Props) {
                 )
               })}
               {items.length === 0 && (
-                <li className="rounded-lg border-2 border-dashed border-slate-300 p-4 text-center text-xs text-slate-400">
+                <li className="rounded-md border-2 border-dashed border-line p-5 text-center font-hand text-base text-faint">
                   Kéo thẻ vào đây
                 </li>
               )}

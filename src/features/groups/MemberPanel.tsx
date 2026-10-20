@@ -44,9 +44,9 @@ export function MemberPanel({ group, members, tasks }: Props) {
                 <div className="flex items-baseline justify-between gap-2">
                   <span className="truncate text-sm font-medium">
                     {m.name}
-                    {m.isMe && <span className="ml-1 text-xs font-normal text-slate-500">(bạn)</span>}
+                    {m.isMe && <span className="ml-1 text-xs font-normal text-muted">(bạn)</span>}
                   </span>
-                  <span className="shrink-0 text-xs text-slate-500">
+                  <span className="shrink-0 text-xs text-muted">
                     {p.done}/{p.total} việc
                   </span>
                 </div>
@@ -59,7 +59,7 @@ export function MemberPanel({ group, members, tasks }: Props) {
           )
         })}
       </ul>
-      {unassigned > 0 && <p className="mt-3 text-xs text-amber-700">{unassigned} việc chưa giao cho ai.</p>}
+      {unassigned > 0 && <p className="mt-3 text-xs text-ochre">{unassigned} việc chưa giao cho ai.</p>}
       <form onSubmit={handleAdd} className="mt-4 flex gap-2">
         <input
           className={inputClass}

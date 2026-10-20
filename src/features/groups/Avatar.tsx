@@ -1,4 +1,5 @@
-const COLORS = ['bg-indigo-500', 'bg-sky-500', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500', 'bg-violet-500']
+// Màu đất, giữ đủ tương phản với chữ trắng ở cả hai theme
+const COLORS = ['bg-[#b9532c]', 'bg-[#3d5f82]', 'bg-[#4f6e3d]', 'bg-[#94680f]', 'bg-[#8a4f6d]', 'bg-[#5f5a8a]']
 
 // Cùng tên thì luôn ra cùng màu
 function colorFor(name: string): string {

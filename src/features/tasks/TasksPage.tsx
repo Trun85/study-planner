@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { Button, EmptyState, PageHeader, inputClass } from '../../components/ui'
 import { deadlineBucket, formatHours, todayISO, type DeadlineBucket } from '../../lib/date'
 import { byDeadline, sumMinutes } from '../../lib/progress'
@@ -16,10 +16,10 @@ const SCOPES: { id: Scope; label: string }[] = [
 ]
 
 const SECTIONS: { bucket: DeadlineBucket; title: string; titleClass: string }[] = [
-  { bucket: 'overdue', title: 'Quá hạn', titleClass: 'text-red-600' },
-  { bucket: 'today', title: 'Hôm nay', titleClass: 'text-amber-700' },
-  { bucket: 'week', title: '7 ngày tới', titleClass: 'text-slate-800' },
-  { bucket: 'later', title: 'Sau đó', titleClass: 'text-slate-800' },
+  { bucket: 'overdue', title: 'Quá hạn', titleClass: 'text-danger' },
+  { bucket: 'today', title: 'Hôm nay', titleClass: 'text-ochre' },
+  { bucket: 'week', title: '7 ngày tới', titleClass: 'text-ink' },
+  { bucket: 'later', title: 'Sau đó', titleClass: 'text-ink' },
 ]
 
 export function TasksPage() {
@@ -55,20 +55,21 @@ export function TasksPage() {
   return (
     <>
       <PageHeader
+        eyebrow="Sổ deadline"
         title="Việc học"
         subtitle={`${visible.length - doneTasks.length} việc chưa xong · ước lượng còn ${formatHours(openMinutes)}`}
         actions={<Button onClick={() => setCreating(true)}>+ Thêm việc</Button>}
       />
 
-      <div className="mb-5 flex flex-wrap items-center gap-3">
-        <div className="inline-flex rounded-lg bg-slate-200/70 p-1" role="group" aria-label="Lọc theo loại">
+      <div className="rise mb-8 flex flex-wrap items-center gap-3" style={{ '--i': 1 } as CSSProperties}>
+        <div className="inline-flex gap-1" role="group" aria-label="Lọc theo loại">
           {SCOPES.map((s) => (
             <button
               key={s.id}
               type="button"
               onClick={() => setScope(s.id)}
               aria-pressed={scope === s.id}
-              className={`rounded-md px-3 py-1 text-sm font-medium transition ${scope === s.id ? 'bg-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+              className={`rounded-full px-3.5 py-1 text-sm font-medium ring-1 transition ${scope === s.id ? 'bg-ink text-paper ring-ink' : 'text-ink-soft ring-line hover:bg-sunken hover:text-ink'}`}
             >
               {s.label}
             </button>
@@ -91,15 +92,15 @@ export function TasksPage() {
           action={!q && <Button onClick={() => setCreating(true)}>+ Thêm việc</Button>}
         />
       ) : (
-        <div className="space-y-6">
-          {SECTIONS.map((section) => {
+        <div className="space-y-9">
+          {SECTIONS.map((section, i) => {
             const items = visible.filter((t) => deadlineBucket(t, today) === section.bucket)
             if (items.length === 0) return null
             return (
-              <section key={section.bucket}>
-                <h2 className="mb-2 flex items-baseline gap-2 text-sm font-semibold">
-                  <span className={section.titleClass}>{section.title}</span>
-                  <span className="font-normal text-slate-500">
+              <section key={section.bucket} className="rise" style={{ '--i': i + 2 } as CSSProperties}>
+                <h2 className="mb-3 flex items-baseline gap-3 border-b border-dashed border-line pb-1.5">
+                  <span className={`text-xl font-semibold ${section.titleClass}`}>{section.title}</span>
+                  <span className="text-sm text-muted">
                     {items.length} việc · ~{formatHours(sumMinutes(items))}
                   </span>
                 </h2>
@@ -109,8 +110,8 @@ export function TasksPage() {
           })}
           {doneTasks.length > 0 && (
             <details className="group">
-              <summary className="cursor-pointer text-sm font-semibold text-slate-500">
-                Đã xong ({doneTasks.length})
+              <summary className="cursor-pointer font-display text-lg text-muted italic hover:text-ink">
+                Đã xong ({doneTasks.length}) <span className="inline-block transition group-open:rotate-90">›</span>
               </summary>
               <ul className="mt-2 space-y-2">{doneTasks.map(renderItem)}</ul>
             </details>

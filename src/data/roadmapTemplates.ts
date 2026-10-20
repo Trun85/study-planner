@@ -75,7 +75,7 @@ export const ROADMAP_TEMPLATES: RoadmapTemplate[] = [
         title: 'Styling với Tailwind CSS',
         description: 'Utility class, responsive, dark mode.',
         hours: 3,
-        resources: [{ title: 'Tailwind CSS Docs', url: 'https://tailwindcss.com/docs' }],
+        resources: [{ title: 'Tailwind CSS – Styling with utility classes', url: 'https://tailwindcss.com/docs/styling-with-utility-classes' }],
       },
       {
         title: 'Dự án cuối và deploy',
@@ -170,19 +170,19 @@ export const ROADMAP_TEMPLATES: RoadmapTemplate[] = [
         title: 'GitHub: remote, push, pull',
         description: 'Tạo repo trên GitHub, đẩy code lên, kéo code về.',
         hours: 2,
-        resources: [{ title: 'GitHub – Hello World', url: 'https://docs.github.com/en/get-started/start-your-journey/hello-world' }],
+        resources: [{ title: 'GitHub – Hello World', url: 'https://docs.github.com/en/get-started/using-github/hello-world' }],
       },
       {
         title: 'Pull request và code review',
         description: 'Mở PR, nhận xét code, cập nhật PR theo góp ý.',
         hours: 2,
-        resources: [{ title: 'GitHub – About pull requests', url: 'https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests' }],
+        resources: [{ title: 'GitHub – Pull requests', url: 'https://docs.github.com/en/pull-requests/reference/pull-requests' }],
       },
       {
         title: 'Xử lý conflict',
         description: 'Vì sao có conflict, cách đọc và giải quyết bằng tay.',
         hours: 2,
-        resources: [{ title: 'GitHub – Resolving a merge conflict', url: 'https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-using-the-command-line' }],
+        resources: [{ title: 'GitHub – Resolving a merge conflict', url: 'https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/resolving-a-merge-conflict-using-the-command-line' }],
       },
       {
         title: 'Quy trình nhóm: GitHub Flow',

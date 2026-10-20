@@ -1,11 +1,13 @@
-import { useEffect, type ButtonHTMLAttributes, type ReactNode } from 'react'
+import { useEffect, type ButtonHTMLAttributes, type CSSProperties, type ReactNode } from 'react'
 import type { Tone } from '../lib/labels'
 
 const BUTTON_VARIANT = {
-  primary: 'bg-indigo-600 text-white hover:bg-indigo-700',
-  secondary: 'bg-white text-slate-700 ring-1 ring-slate-300 hover:bg-slate-50',
-  danger: 'bg-white text-red-600 ring-1 ring-red-200 hover:bg-red-50',
-  ghost: 'text-slate-600 hover:bg-slate-100',
+  // Nút chính như con dấu mực: bóng đậm phía dưới, bấm thì lún xuống
+  primary:
+    'bg-accent text-card shadow-[0_2px_0_var(--accent-strong)] hover:bg-accent-strong active:translate-y-px active:shadow-[0_1px_0_var(--accent-strong)]',
+  secondary: 'bg-card text-ink-soft ring-1 ring-line hover:bg-sunken hover:text-ink',
+  danger: 'bg-transparent text-danger ring-1 ring-danger/40 hover:bg-danger-soft',
+  ghost: 'text-ink-soft hover:bg-sunken hover:text-ink',
 }
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -14,27 +16,32 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export function Button({ variant = 'primary', size = 'md', type = 'button', className = '', ...props }: ButtonProps) {
-  const sizeClass = size === 'sm' ? 'px-2.5 py-1 text-xs' : 'px-3.5 py-2 text-sm'
+  const sizeClass = size === 'sm' ? 'px-2.5 py-1 text-xs' : 'px-4 py-2 text-sm'
   return (
     <button
       type={type}
-      className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:cursor-not-allowed disabled:opacity-50 ${sizeClass} ${BUTTON_VARIANT[variant]} ${className}`}
+      className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${sizeClass} ${BUTTON_VARIANT[variant]} ${className}`}
       {...props}
     />
   )
 }
 
 const TONE: Record<Tone, string> = {
-  slate: 'bg-slate-100 text-slate-700',
-  indigo: 'bg-indigo-50 text-indigo-700',
-  sky: 'bg-sky-50 text-sky-700',
-  emerald: 'bg-emerald-50 text-emerald-700',
-  amber: 'bg-amber-50 text-amber-800',
-  red: 'bg-red-50 text-red-700',
+  neutral: 'bg-sunken text-ink-soft',
+  accent: 'bg-accent-soft text-accent-strong',
+  blue: 'bg-blue-soft text-blue',
+  moss: 'bg-moss-soft text-moss',
+  ochre: 'bg-ochre-soft text-ochre',
+  danger: 'bg-danger-soft text-danger',
 }
 
-export function Badge({ tone = 'slate', children }: { tone?: Tone; children: ReactNode }) {
-  return <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${TONE[tone]}`}>{children}</span>
+/** Nhãn nhỏ như mẩu giấy ghi chú. */
+export function Badge({ tone = 'neutral', children }: { tone?: Tone; children: ReactNode }) {
+  return (
+    <span className={`inline-flex items-center rounded-[3px] px-1.5 py-px text-[11px] font-semibold tracking-wide ${TONE[tone]}`}>
+      {children}
+    </span>
+  )
 }
 
 export function ProgressBar({ value, label }: { value: number; label?: string }) {
@@ -42,7 +49,7 @@ export function ProgressBar({ value, label }: { value: number; label?: string })
   return (
     <div className="flex items-center gap-3">
       <div
-        className="h-2 flex-1 overflow-hidden rounded-full bg-slate-200"
+        className="h-1.5 flex-1 overflow-hidden rounded-full bg-sunken"
         role="progressbar"
         aria-valuenow={pct}
         aria-valuemin={0}
@@ -50,17 +57,38 @@ export function ProgressBar({ value, label }: { value: number; label?: string })
         aria-label={label}
       >
         <div
-          className={`h-full rounded-full transition-all ${pct === 100 ? 'bg-emerald-500' : 'bg-indigo-500'}`}
+          className={`h-full rounded-full transition-[width] duration-500 ${pct === 100 ? 'bg-moss' : 'bg-accent'}`}
           style={{ width: `${pct}%` }}
         />
       </div>
-      <span className="w-10 text-right text-xs font-medium text-slate-600 tabular-nums">{pct}%</span>
+      <span className="w-10 text-right text-xs font-semibold text-ink-soft tabular-nums">{pct}%</span>
     </div>
   )
 }
 
-export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <section className={`rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 ${className}`}>{children}</section>
+interface CardProps {
+  children: ReactNode
+  className?: string
+  tape?: boolean // dán một mẩu băng keo giấy ở mép trên
+  index?: number // thứ tự xuất hiện khi trang vừa mở
+}
+
+/** Một trang giấy: nền sáng hơn nền chính, viền mảnh, bóng nhẹ. */
+export function Card({ children, className = '', tape, index }: CardProps) {
+  return (
+    <section
+      className={`relative rounded-lg bg-card p-5 shadow-paper ring-1 ring-line ${index !== undefined ? 'rise' : ''} ${className}`}
+      style={index !== undefined ? ({ '--i': index } as CSSProperties) : undefined}
+    >
+      {tape && (
+        <span
+          aria-hidden="true"
+          className="absolute -top-2.5 left-1/2 h-5 w-20 -translate-x-1/2 -rotate-2 bg-ochre-soft/90 shadow-sm ring-1 ring-ochre/15"
+        />
+      )}
+      {children}
+    </section>
+  )
 }
 
 export function Modal({ open, title, onClose, children }: { open: boolean; title: string; onClose: () => void; children: ReactNode }) {
@@ -73,16 +101,19 @@ export function Modal({ open, title, onClose, children }: { open: boolean; title
 
   if (!open) return null
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-4 sm:items-center" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 backdrop-blur-[2px] sm:items-center"
+      onClick={onClose}
+    >
       <div
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white p-5 shadow-xl"
+        className="rise max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg bg-card p-6 shadow-2xl ring-1 ring-line"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">{title}</h2>
+        <div className="mb-5 flex items-center justify-between border-b border-dashed border-line pb-3">
+          <h2 className="text-xl font-semibold">{title}</h2>
           <Button variant="ghost" size="sm" onClick={onClose} aria-label="Đóng">
             ✕
           </Button>
@@ -94,12 +125,12 @@ export function Modal({ open, title, onClose, children }: { open: boolean; title
 }
 
 export const inputClass =
-  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200'
+  'w-full rounded-md border border-line bg-paper px-3 py-2 text-sm text-ink placeholder:text-faint transition focus:border-accent focus:bg-card focus:outline-none focus:ring-2 focus:ring-accent/20'
 
 export function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-sm font-medium text-slate-700">{label}</span>
+      <span className="mb-1 block text-xs font-semibold tracking-wide text-muted uppercase">{label}</span>
       {children}
     </label>
   )
@@ -107,20 +138,28 @@ export function Field({ label, children }: { label: string; children: ReactNode 
 
 export function EmptyState({ title, hint, action }: { title: string; hint?: string; action?: ReactNode }) {
   return (
-    <div className="rounded-xl border-2 border-dashed border-slate-300 p-8 text-center">
-      <p className="font-medium text-slate-700">{title}</p>
-      {hint && <p className="mt-1 text-sm text-slate-500">{hint}</p>}
-      {action && <div className="mt-4">{action}</div>}
+    <div className="rounded-lg border-2 border-dashed border-line bg-card/50 p-10 text-center">
+      <p className="font-display text-xl font-semibold text-ink">{title}</p>
+      {hint && <p className="mt-1 font-hand text-lg text-muted">{hint}</p>}
+      {action && <div className="mt-5">{action}</div>}
     </div>
   )
 }
 
-export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: ReactNode }) {
+interface PageHeaderProps {
+  title: string
+  eyebrow?: string // dòng ghi chú viết tay phía trên tiêu đề
+  subtitle?: string
+  actions?: ReactNode
+}
+
+export function PageHeader({ title, eyebrow, subtitle, actions }: PageHeaderProps) {
   return (
-    <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+    <div className="rise mb-7 flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}
+        {eyebrow && <p className="mb-1 -rotate-1 font-hand text-lg text-accent">{eyebrow}</p>}
+        <h1 className="text-3xl leading-tight font-semibold tracking-tight sm:text-4xl">{title}</h1>
+        {subtitle && <p className="mt-1.5 text-sm text-muted">{subtitle}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </div>

@@ -20,6 +20,7 @@ export function GroupsPage() {
   return (
     <>
       <PageHeader
+        eyebrow="Làm việc nhóm"
         title="Bài tập nhóm"
         subtitle="Giao việc cho từng thành viên và theo dõi tiến độ trên bảng Kanban."
         actions={<Button onClick={() => setCreating(true)}>+ Tạo nhóm</Button>}
@@ -41,23 +42,23 @@ export function GroupsPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedId(g.id)}
-                  className="w-full rounded-xl bg-white p-4 text-left shadow-sm ring-1 ring-slate-200 transition hover:ring-indigo-300 focus-visible:outline-2 focus-visible:outline-indigo-500"
+                  className="w-full rounded-lg bg-card p-5 text-left shadow-paper ring-1 ring-line transition hover:-translate-y-0.5 hover:ring-accent focus-visible:outline-2 focus-visible:outline-accent"
                 >
-                  <p className="font-semibold">{g.name}</p>
-                  <p className="mt-0.5 text-sm text-slate-500">
-                    {[g.subject, g.deadline && `Hạn ${formatDate(g.deadline)} · ${relativeLabel(g.deadline, today).toLowerCase()}`]
+                  <p className="font-display text-lg font-semibold">{g.name}</p>
+                  <p className="mt-0.5 text-sm text-muted">
+                    {[g.subject, g.deadline && `Hạn ${formatDate(g.deadline)} · ${p.total > 0 && p.done === p.total ? 'đã hoàn thành' : relativeLabel(g.deadline, today).toLowerCase()}`]
                       .filter(Boolean)
                       .join(' · ') || 'Chưa có hạn nộp'}
                   </p>
                   <div className="mt-3 flex items-center justify-between">
                     <div className="flex -space-x-1.5">
                       {members.slice(0, 5).map((m) => (
-                        <span key={m.id} className="rounded-full ring-2 ring-white">
+                        <span key={m.id} className="rounded-full ring-2 ring-card">
                           <Avatar name={m.name} size="md" />
                         </span>
                       ))}
                     </div>
-                    <span className="text-xs text-slate-500">
+                    <span className="text-xs text-muted">
                       {p.done}/{p.total} việc xong
                     </span>
                   </div>
