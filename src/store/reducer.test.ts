@@ -9,7 +9,8 @@ describe('reducer', () => {
     const state = createSeedData(today)
     const groupId = state.groups[0].id
     const next = reducer(state, { type: 'group/delete', id: groupId })
-    expect(next.groups).toHaveLength(0)
+    expect(next.groups.map((g) => g.id)).not.toContain(groupId)
+    expect(next.groups).toHaveLength(state.groups.length - 1) // các nhóm khác giữ nguyên
     expect(next.members.some((m) => m.groupId === groupId)).toBe(false)
     expect(next.tasks.some((t) => t.groupId === groupId)).toBe(false)
     expect(next.tasks.length).toBeGreaterThan(0) // việc cá nhân vẫn còn
